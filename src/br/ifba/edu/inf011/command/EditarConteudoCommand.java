@@ -7,11 +7,11 @@ import br.ifba.edu.inf011.model.documentos.Documento;
 
 public class EditarConteudoCommand implements DocumentoCommand {
 
-    private GerenciadorDocumentoModel receiver;
-    private String novoConteudo;
+    private final GerenciadorDocumentoModel receiver;
+    private final String novoConteudo;
 
-    private Documento documento;
-    private DocumentoMemento memento;
+    private Documento documentoBase;      // alvo real do conteúdo
+    private DocumentoMemento memento;     // snapshot antes
 
     public EditarConteudoCommand(GerenciadorDocumentoModel receiver, String novoConteudo) {
         this.receiver = receiver;
@@ -22,16 +22,21 @@ public class EditarConteudoCommand implements DocumentoCommand {
     public void execute() throws Exception {
         Documento doc = receiver.getDocumentoAtual();
 
+        // sempre editar o documento base (não o decorado)
         if (doc instanceof DocumentoDecorator) {
             doc = ((DocumentoDecorator) doc).getDocumentoBase();
         }
 
-        receiver.salvarDocumento(doc, novoConteudo);
+        this.documentoBase = doc;
+        this.memento = new DocumentoMemento(documentoBase); // snapshot ANTES
+
+        receiver.salvarDocumento(documentoBase, novoConteudo);
+        receiver.setDocumentoAtual(documentoBase);
     }
 
     @Override
     public void undo() throws Exception {
-        memento.restaurar(documento);
-        receiver.setDocumentoAtual(documento);
+        memento.restaurar(documentoBase);
+        receiver.setDocumentoAtual(documentoBase);
     }
 }
