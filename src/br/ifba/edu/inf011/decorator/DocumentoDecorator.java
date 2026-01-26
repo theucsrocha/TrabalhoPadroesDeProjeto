@@ -56,4 +56,13 @@ public class DocumentoDecorator implements Documento{
 		
 	}	
 	
+	public Documento getDocumentoBase() {
+	    Documento atual = this;
+	    while (atual instanceof DocumentoDecorator) {
+	        atual = ((DocumentoDecorator) atual).wrappeeDocumento;
+	    }
+	    return atual;
+	}
+
+	
 }
