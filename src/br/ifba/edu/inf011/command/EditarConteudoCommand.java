@@ -7,36 +7,38 @@ import br.ifba.edu.inf011.model.documentos.Documento;
 
 public class EditarConteudoCommand implements DocumentoCommand {
 
-    private final GerenciadorDocumentoModel receiver;
-    private final String novoConteudo;
+	private final GerenciadorDocumentoModel receiver;
+	private final String novoConteudo;
 
-    private Documento documentoBase;      // alvo real do conteúdo
-    private DocumentoMemento memento;     // snapshot antes
+	private Documento documentoBase; // alvo real do conteúdo
+	private DocumentoMemento memento; // snapshot antes
 
-    public EditarConteudoCommand(GerenciadorDocumentoModel receiver, String novoConteudo) {
-        this.receiver = receiver;
-        this.novoConteudo = novoConteudo;
-    }
+	public EditarConteudoCommand(GerenciadorDocumentoModel receiver, String novoConteudo) {
+		this.receiver = receiver;
+		this.novoConteudo = novoConteudo;
+	}
 
-    @Override
-    public void execute() throws Exception {
-        Documento doc = receiver.getDocumentoAtual();
+	@Override
+	public void execute() throws Exception {
+		Documento atual = receiver.getDocumentoAtual();
 
-        // sempre editar o documento base (não o decorado)
-        if (doc instanceof DocumentoDecorator) {
-            doc = ((DocumentoDecorator) doc).getDocumentoBase();
-        }
+		Documento base = atual;
+		while (base instanceof DocumentoDecorator) {
+			base = ((DocumentoDecorator) base).getDocumentoBase();
+		}
 
-        this.documentoBase = doc;
-        this.memento = new DocumentoMemento(documentoBase); // snapshot ANTES
+		this.documentoBase = base;
+		this.memento = new DocumentoMemento(base);
 
-        receiver.salvarDocumento(documentoBase, novoConteudo);
-        receiver.setDocumentoAtual(documentoBase);
-    }
+		base.setConteudo(novoConteudo);
 
-    @Override
-    public void undo() throws Exception {
-        memento.restaurar(documentoBase);
-        receiver.setDocumentoAtual(documentoBase);
-    }
+		receiver.setDocumentoAtual(base);
+	}
+
+	@Override
+	public void undo() throws Exception {
+	    memento.restaurar(documentoBase);
+	    receiver.setDocumentoAtual(documentoBase);
+	}
+
 }
