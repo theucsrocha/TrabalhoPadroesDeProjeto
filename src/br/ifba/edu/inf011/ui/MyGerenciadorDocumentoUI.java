@@ -3,16 +3,7 @@ package br.ifba.edu.inf011.ui;
 import javax.swing.JOptionPane;
 
 import br.ifba.edu.inf011.af.DocumentOperatorFactory;
-import br.ifba.edu.inf011.command.AlterarEAssinarCommand;
-import br.ifba.edu.inf011.command.AssinarCommand;
-import br.ifba.edu.inf011.command.CommandManager;
-import br.ifba.edu.inf011.command.ConsolidarCommand;
-import br.ifba.edu.inf011.command.DocumentoCommand;
-import br.ifba.edu.inf011.command.EditarConteudoCommand;
-import br.ifba.edu.inf011.command.PriorizarCommand;
-import br.ifba.edu.inf011.command.ProtegerCommand;
-import br.ifba.edu.inf011.command.UrgenteCommand;
-import br.ifba.edu.inf011.model.FWDocumentException;
+import br.ifba.edu.inf011.command.*;
 import br.ifba.edu.inf011.model.documentos.Privacidade;
 
 public class MyGerenciadorDocumentoUI extends AbstractGerenciadorDocumentosUI{
@@ -55,7 +46,7 @@ public class MyGerenciadorDocumentoUI extends AbstractGerenciadorDocumentosUI{
 	protected void salvarConteudo() {
 	    try {
 	    	DocumentoCommand cmd =
-	    		    new EditarConteudoCommand(
+	    		    new SalvarDocumentoCommand(
 	    		        this.controller,
 	    		        this.areaEdicao.getConteudo()
 	    		    );
@@ -118,10 +109,17 @@ public class MyGerenciadorDocumentoUI extends AbstractGerenciadorDocumentosUI{
 	private void criarDocumento(Privacidade privacidade) {
         try {
             int tipoIndex = this.barraSuperior.getTipoSelecionadoIndice();
-            this.atual = this.controller.criarDocumento(tipoIndex, privacidade);
-            this.barraDocs.addDoc("[" + atual.getNumero() + "]");
-            this.refreshUI();
-        } catch (FWDocumentException e) {
+			DocumentoCommand cmd =
+					new CriarDocumentoCommand(this.controller, tipoIndex, privacidade);
+
+			commandManager.executar(cmd);
+			this.atual = controller.getDocumentoAtual();
+
+            if (this.atual != null)
+				this.barraDocs.addDoc("[" + atual.getNumero() + "]");
+
+			this.refreshUI();
+        } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage());
         }
     }	
