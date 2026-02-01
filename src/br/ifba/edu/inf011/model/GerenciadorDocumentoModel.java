@@ -43,11 +43,15 @@ public class GerenciadorDocumentoModel {
         return documento;
     }
 
-    public void salvarDocumento(Documento doc, String conteudo) throws Exception {
-        if (doc != null) {
+    public Documento salvarDocumento(Documento doc, String conteudo) throws Exception {
+        if (doc == null) return null;
+
+        if (doc.getConteudo() == null || !doc.getConteudo().equals(conteudo))
             doc.setConteudo(conteudo);
-        }
+
         this.atual = doc;
+
+        return doc;
     }
 
     public List<Documento> getRepositorio() {

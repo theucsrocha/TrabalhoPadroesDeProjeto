@@ -162,7 +162,7 @@ Capturar e externalizar o estado interno de um objeto sem violar seu encapsulame
 * **Consolidar:** limpa os históricos de undo/redo, confirmando permanentemente as alterações.
 
 Essas funcionalidades são centralizadas no `CommandManager`, conforme exigido pelo enunciado.
-
+Os logs das operações são salvos pela classe `OperacoesLogger` composta com a `CommandManager`. O arquivo é salvo como `operacoes.log` na raíz do projeto.  
 ---
 
 
